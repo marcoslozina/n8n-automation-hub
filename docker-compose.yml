@@ -1,21 +1,111 @@
-version: "3"
-
 services:
+  - type: web
+    name: n8n-server
+    env: image
+    image:
+      url: docker.n8n.io/n8nio/n8n:1.107.4
+    plan: starter
+    healthCheckPath: /healthz
+    envVars:
+      # Base de datos PostgreSQL
+      - key: DB_TYPE
+        value: postgresdb
+      - key: DB_POSTGRESDB_HOST
+        fromDatabase:
+          name: automation-db
+          property: host
+      - key: DB_POSTGRESDB_PORT
+        fromDatabase:
+          name: automation-db
+          property: port
+      - key: DB_POSTGRESDB_DATABASE
+        fromDatabase:
+          name: automation-db
+          property: database
+      - key: DB_POSTGRESDB_USER
+        fromDatabase:
+          name: automation-db
+          property: user
+      - key: DB_POSTGRESDB_PASSWORD
+        fromDatabase:
+          name: automation-db
+          property: password
 
-  n8n:
-    image: n8nio/n8n
-    container_name: n8n
-    ports:
-      - "5678:5678"
-    volumes:
-      - ./n8n_data:/home/node/.n8n
-    restart: always
+      # n8n config
+      - key: N8N_HOST
+        value: automation.marcoslozina.com
+      - key: N8N_PORT
+        value: 5678
+      - key: N8N_PROTOCOL
+        value: https
+      - key: WEBHOOK_URL
+        value: https://automation.marcoslozina.com/
+      - key: N8N_EDITOR_BASE_URL
+        value: https://automation.marcoslozina.com
+      - key: NODE_ENV
+        value: production
 
-  flowise:
-    image: flowiseai/flowise
-    container_name: flowise
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./flowise_data:/root/.flowise
-    restart: always
+      # zona horaria
+      - key: GENERIC_TIMEZONE
+        value: America/Argentina/Buenos_Aires
+      - key: TZ
+        value: America/Argentina/Buenos_Aires
+
+      # seguridad
+      - key: N8N_BASIC_AUTH_ACTIVE
+        value: "true"
+      - key: N8N_BASIC_AUTH_USER
+        sync: false
+      - key: N8N_BASIC_AUTH_PASSWORD
+        sync: false
+      - key: N8N_ENCRYPTION_KEY
+        generateValue: true
+
+      # opcional: evitar telemetría
+      - key: N8N_DIAGNOSTICS_ENABLED
+        value: "false"
+
+  - type: web
+    name: flowise-server
+    env: image
+    image:
+      url: flowiseai/flowise:latest
+    plan: starter
+    healthCheckPath: /
+    envVars:
+      - key: PORT
+        value: 3000
+      - key: FLOWISE_USERNAME
+        sync: false
+      - key: FLOWISE_PASSWORD
+        sync: false
+      - key: DATABASE_TYPE
+        value: postgres
+      - key: DATABASE_HOST
+        fromDatabase:
+          name: automation-db
+          property: host
+      - key: DATABASE_PORT
+        fromDatabase:
+          name: automation-db
+          property: port
+      - key: DATABASE_NAME
+        fromDatabase:
+          name: automation-db
+          property: database
+      - key: DATABASE_USER
+        fromDatabase:
+          name: automation-db
+          property: user
+      - key: DATABASE_PASSWORD
+        fromDatabase:
+          name: automation-db
+          property: password
+      - key: TZ
+        value: America/Argentina/Buenos_Aires
+
+databases:
+  - name: automation-db
+    databaseName: automationhub
+    user: automationhub
+    plan: starter
