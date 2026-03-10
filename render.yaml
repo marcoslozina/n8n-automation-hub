@@ -3,55 +3,109 @@ services:
     name: n8n-server
     env: image
     image:
-      url: docker.n8n.io/n8nio/n8n:latest
-    plan: free # Cambiar a 'starter' ($7/mes) si quieres usar cronjobs y que no se duerma
+      url: docker.n8n.io/n8nio/n8n:1.107.4
+    plan: starter
     healthCheckPath: /healthz
     envVars:
-      # Configuracion de Base de Datos PostgreSQL
+      # Base de datos PostgreSQL
       - key: DB_TYPE
         value: postgresdb
-      - key: DB_POSTGRESDB_DATABASE
-        value: n8n
-      - key: DB_POSTGRESDB_USER
-        value: n8n
-      - key: DB_POSTGRESDB_PASSWORD
-        fromDatabase:
-          name: n8n-db
-          property: password
       - key: DB_POSTGRESDB_HOST
         fromDatabase:
-          name: n8n-db
+          name: automation-db
           property: host
       - key: DB_POSTGRESDB_PORT
         fromDatabase:
-          name: n8n-db
+          name: automation-db
           property: port
-          
-      # Configuracion de N8N
+      - key: DB_POSTGRESDB_DATABASE
+        fromDatabase:
+          name: automation-db
+          property: database
+      - key: DB_POSTGRESDB_USER
+        fromDatabase:
+          name: automation-db
+          property: user
+      - key: DB_POSTGRESDB_PASSWORD
+        fromDatabase:
+          name: automation-db
+          property: password
+
+      # n8n config
       - key: N8N_HOST
         value: automation.marcoslozina.com
       - key: N8N_PORT
         value: 5678
       - key: N8N_PROTOCOL
         value: https
-      - key: NODE_ENV
-        value: production
       - key: WEBHOOK_URL
         value: https://automation.marcoslozina.com/
-        
-      # Seguridad (Basic Auth)
-      - key: N8N_BASIC_AUTH_ACTIVE
-        value: true
-      - key: N8N_BASIC_AUTH_USER
-        sync: false # Render te pedira que ingreses este valor manual en su panel web
-      - key: N8N_BASIC_AUTH_PASSWORD
-        sync: false # Al igual que este
-      - key: N8N_ENCRYPTION_KEY
-        generateValue: true # Render generara una clave encriptada segura automaticamente
+      - key: N8N_EDITOR_BASE_URL
+        value: https://automation.marcoslozina.com
+      - key: NODE_ENV
+        value: production
 
-# Base de datos PostgreSQL para n8n
+      # zona horaria
+      - key: GENERIC_TIMEZONE
+        value: America/Argentina/Buenos_Aires
+      - key: TZ
+        value: America/Argentina/Buenos_Aires
+
+      # seguridad
+      - key: N8N_BASIC_AUTH_ACTIVE
+        value: "true"
+      - key: N8N_BASIC_AUTH_USER
+        sync: false
+      - key: N8N_BASIC_AUTH_PASSWORD
+        sync: false
+      - key: N8N_ENCRYPTION_KEY
+        generateValue: true
+
+      # opcional: evitar telemetría
+      - key: N8N_DIAGNOSTICS_ENABLED
+        value: "false"
+
+  - type: web
+    name: flowise-server
+    env: image
+    image:
+      url: flowiseai/flowise:latest
+    plan: starter
+    healthCheckPath: /
+    envVars:
+      - key: PORT
+        value: 3000
+      - key: FLOWISE_USERNAME
+        sync: false
+      - key: FLOWISE_PASSWORD
+        sync: false
+      - key: DATABASE_TYPE
+        value: postgres
+      - key: DATABASE_HOST
+        fromDatabase:
+          name: automation-db
+          property: host
+      - key: DATABASE_PORT
+        fromDatabase:
+          name: automation-db
+          property: port
+      - key: DATABASE_NAME
+        fromDatabase:
+          name: automation-db
+          property: database
+      - key: DATABASE_USER
+        fromDatabase:
+          name: automation-db
+          property: user
+      - key: DATABASE_PASSWORD
+        fromDatabase:
+          name: automation-db
+          property: password
+      - key: TZ
+        value: America/Argentina/Buenos_Aires
+
 databases:
-  - name: n8n-db
-    databaseName: n8n
-    user: n8n
-    plan: free # ATENCION: Las bases de datos Free de Render se ELIMINAN a los 90 dias
+  - name: automation-db
+    databaseName: automationhub
+    user: automationhub
+    plan: starter
