@@ -3,8 +3,8 @@ services:
     name: n8n-server
     env: image
     image:
-      url: docker.n8n.io/n8nio/n8n:1.107.4
-    plan: starter
+      url: docker.n8n.io/n8nio/n8n:latest
+    plan: free
     healthCheckPath: /healthz
     envVars:
       # Base de datos PostgreSQL
@@ -65,12 +65,16 @@ services:
       - key: N8N_DIAGNOSTICS_ENABLED
         value: "false"
 
+      # permisos del archivo de configuración
+      - key: N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS
+        value: "true"
+
   - type: web
     name: flowise-server
     env: image
     image:
       url: flowiseai/flowise:latest
-    plan: starter
+    plan: free
     healthCheckPath: /
     envVars:
       - key: PORT
