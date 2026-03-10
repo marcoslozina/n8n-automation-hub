@@ -33,15 +33,15 @@ services:
 
       # n8n config
       - key: N8N_HOST
-        value: automation.marcoslozina.com
+        value: n8n-server-yjgk.onrender.com
       - key: N8N_PORT
         value: 5678
       - key: N8N_PROTOCOL
         value: https
       - key: WEBHOOK_URL
-        value: https://automation.marcoslozina.com/
+        value: https://n8n-server-yjgk.onrender.com/
       - key: N8N_EDITOR_BASE_URL
-        value: https://automation.marcoslozina.com
+        value: https://n8n-server-yjgk.onrender.com
       - key: NODE_ENV
         value: production
 
