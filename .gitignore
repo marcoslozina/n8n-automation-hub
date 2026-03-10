@@ -1,0 +1,22 @@
+# Archivos de entorno y variables secretas
+.env
+.env.*
+!.env.example
+
+# Datos de n8n (Bases de datos SQLite locales y configuraciones)
+n8n_data/
+
+# Datos de Flowise
+flowise_data/
+
+# Archivos de certificados generados por Traefik en local
+letsencrypt/
+acme.json
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Directorios locales de datos con nuevos nombres
+.n8n_data_local/
+.flowise_data_local/
