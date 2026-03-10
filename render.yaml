@@ -108,4 +108,4 @@ databases:
   - name: automation-db
     databaseName: automationhub
     user: automationhub
-    plan: starter
+    plan: free
