@@ -69,45 +69,6 @@ services:
       - key: N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS
         value: "true"
 
-  - type: web
-    name: flowise-server
-    env: image
-    image:
-      url: flowiseai/flowise:latest
-    plan: free
-    healthCheckPath: /
-    envVars:
-      - key: PORT
-        value: 3000
-      - key: FLOWISE_USERNAME
-        sync: false
-      - key: FLOWISE_PASSWORD
-        sync: false
-      - key: DATABASE_TYPE
-        value: postgres
-      - key: DATABASE_HOST
-        fromDatabase:
-          name: automation-db
-          property: host
-      - key: DATABASE_PORT
-        fromDatabase:
-          name: automation-db
-          property: port
-      - key: DATABASE_NAME
-        fromDatabase:
-          name: automation-db
-          property: database
-      - key: DATABASE_USER
-        fromDatabase:
-          name: automation-db
-          property: user
-      - key: DATABASE_PASSWORD
-        fromDatabase:
-          name: automation-db
-          property: password
-      - key: TZ
-        value: America/Argentina/Buenos_Aires
-
 databases:
   - name: automation-db
     databaseName: automationhub
